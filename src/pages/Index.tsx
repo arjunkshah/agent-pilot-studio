@@ -95,6 +95,12 @@ const Index = () => {
         <div className="pt-24 pb-20">
           <AgentCreation task={currentTask} onReset={handleReset} />
         </div>
+      ) : isLoggedIn ? (
+        <div className="pt-24 pb-20">
+          <div id="task-input" className="py-20 bg-background">
+            <TaskInput onTaskSubmit={handleTaskSubmit} isCreating={isCreating} />
+          </div>
+        </div>
       ) : (
         <>
           {/* Hero Section */}
@@ -105,16 +111,10 @@ const Index = () => {
               gradient: "custom AI agents to do it",
             }}
             description="From writing emails to analyzing data, our AI creates specialized agents tailored to your exact needs. No coding required."
-            ctaText={isLoggedIn ? "Create Your First Agent" : "Get Started"}
-            ctaHref="#task-input"
+            ctaText="Get Started"
+            ctaHref="#"
+            onCtaClick={handleGetStartedClick}
           />
-
-          {/* Task Input Section - Only show if logged in */}
-          {isLoggedIn && (
-            <div id="task-input" className="py-20 bg-background">
-              <TaskInput onTaskSubmit={handleTaskSubmit} isCreating={isCreating} />
-            </div>
-          )}
 
           {/* Enhanced Features Section */}
           <div className="py-32 bg-gradient-to-b from-background via-background/95 to-muted/20 relative overflow-hidden">
@@ -272,7 +272,7 @@ const Index = () => {
                       onClick={handleGetStartedClick}
                       className="inline-flex items-center gap-2 bg-white text-purple-600 px-8 py-4 rounded-xl font-semibold hover:bg-white/90 transition-all duration-300 text-lg hover:scale-105"
                     >
-                      {isLoggedIn ? 'Create Your First Agent' : 'Get Started Free'} 
+                      Get Started Free 
                       <ArrowRight className="w-5 h-5" />
                     </button>
                     <div className="mt-6 flex items-center justify-center gap-6 text-white/60 text-sm">
