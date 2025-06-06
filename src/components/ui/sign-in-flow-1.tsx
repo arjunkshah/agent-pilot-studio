@@ -9,232 +9,55 @@ interface SignInPageProps {
   className?: string;
   onSignInSuccess?: () => void;
 }
-      
-export const CanvasRevealEffect = ({
-  animationSpeed = 10,
-  opacities = [0.3, 0.3, 0.3, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 1],
-  colors = [[0, 255, 255]],
-  containerClassName,
-  dotSize,
-  showGradient = true,
-  reverse = false,
-}: {
-  animationSpeed?: number;
-  opacities?: number[];
-  colors?: number[][];
-  containerClassName?: string;
-  dotSize?: number;
-  showGradient?: boolean;
-  reverse?: boolean;
-}) => {
-  return (
-    <div className={cn("h-full relative w-full", containerClassName)}>
-      <div className="h-full w-full">
-        <DotMatrix
-          colors={colors ?? [[0, 255, 255]]}
-          dotSize={dotSize ?? 3}
-          opacities={
-            opacities ?? [0.3, 0.3, 0.3, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 1]
-          }
-          animationSpeed={animationSpeed}
-          reverse={reverse}
-        />
-      </div>
-      {showGradient && (
-         <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
-      )}
-    </div>
-  );
-};
-
-interface DotMatrixProps {
-  colors?: number[][];
-  opacities?: number[];
-  dotSize?: number;
-  animationSpeed?: number;
-  reverse?: boolean;
-}
-
-const DotMatrix: React.FC<DotMatrixProps> = ({
-  colors = [[255, 255, 255]],
-  opacities = [0.04, 0.04, 0.04, 0.04, 0.04, 0.08, 0.08, 0.08, 0.08, 0.14],
-  dotSize = 2,
-  animationSpeed = 3,
-  reverse = false,
-}) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [dots, setDots] = useState<Array<{id: number, x: number, y: number, opacity: number, delay: number}>>([]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const rect = container.getBoundingClientRect();
-    const spacing = 20;
-    const dotsX = Math.floor(rect.width / spacing);
-    const dotsY = Math.floor(rect.height / spacing);
-    
-    const newDots = [];
-    for (let x = 0; x < dotsX; x++) {
-      for (let y = 0; y < dotsY; y++) {
-        const centerX = dotsX / 2;
-        const centerY = dotsY / 2;
-        const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
-        const maxDistance = Math.sqrt(centerX ** 2 + centerY ** 2);
-        
-        newDots.push({
-          id: x * dotsY + y,
-          x: x * spacing + spacing / 2,
-          y: y * spacing + spacing / 2,
-          opacity: opacities[Math.floor(Math.random() * opacities.length)],
-          delay: reverse ? (maxDistance - distance) * 0.1 : distance * 0.1
-        });
-      }
-    }
-    
-    setDots(newDots);
-  }, [opacities, reverse]);
-
-  const colorRgb = colors[0] || [255, 255, 255];
-
-  return (
-    <div ref={containerRef} className="absolute inset-0 overflow-hidden">
-      {dots.map((dot) => (
-        <motion.div
-          key={dot.id}
-          className="absolute rounded-full"
-          style={{
-            left: dot.x,
-            top: dot.y,
-            width: dotSize,
-            height: dotSize,
-            backgroundColor: `rgb(${colorRgb[0]}, ${colorRgb[1]}, ${colorRgb[2]})`,
-          }}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ 
-            opacity: dot.opacity, 
-            scale: 1 
-          }}
-          transition={{
-            duration: 0.5,
-            delay: dot.delay / animationSpeed,
-            ease: "easeOut"
-          }}
-        />
-      ))}
-    </div>
-  );
-};
 
 export const SignInPage = ({ className, onSignInSuccess }: SignInPageProps) => {
   const [email, setEmail] = useState("");
-  const [step, setStep] = useState<"email" | "code" | "success">("email");
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
-  const codeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const [initialCanvasVisible, setInitialCanvasVisible] = useState(true);
-  const [reverseCanvasVisible, setReverseCanvasVisible] = useState(false);
+  const [password, setPassword] = useState("");
+  const [step, setStep] = useState<"email" | "password" | "signup" | "success">("email");
+  const [isSignUp, setIsSignUp] = useState(false);
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      setStep("code");
+      setStep("password");
     }
   };
 
-  useEffect(() => {
-    if (step === "code") {
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password) {
+      setStep("success");
       setTimeout(() => {
-        codeInputRefs.current[0]?.focus();
-      }, 500);
-    }
-  }, [step]);
-
-  const handleCodeChange = (index: number, value: string) => {
-    if (value.length <= 1) {
-      const newCode = [...code];
-      newCode[index] = value;
-      setCode(newCode);
-      
-      if (value && index < 5) {
-        codeInputRefs.current[index + 1]?.focus();
-      }
-      
-      if (index === 5 && value) {
-        const isComplete = newCode.every(digit => digit.length === 1);
-        if (isComplete) {
-          setReverseCanvasVisible(true);
-          
-          setTimeout(() => {
-            setInitialCanvasVisible(false);
-          }, 50);
-          
-          setTimeout(() => {
-            setStep("success");
-          }, 2000);
+        // Store login state in localStorage
+        localStorage.setItem('pilot_logged_in', 'true');
+        localStorage.setItem('pilot_user_email', email);
+        
+        // Call the success callback if provided
+        if (onSignInSuccess) {
+          onSignInSuccess();
         }
-      }
-    }
-  };
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !code[index] && index > 0) {
-      codeInputRefs.current[index - 1]?.focus();
+      }, 1000);
     }
   };
 
   const handleBackClick = () => {
     setStep("email");
-    setCode(["", "", "", "", "", ""]);
-    setReverseCanvasVisible(false);
-    setInitialCanvasVisible(true);
+    setPassword("");
   };
 
-  const handleContinueToDashboard = () => {
-    // Store login state in localStorage
-    localStorage.setItem('pilot_logged_in', 'true');
-    localStorage.setItem('pilot_user_email', email);
-    
-    // Call the success callback if provided
-    if (onSignInSuccess) {
-      onSignInSuccess();
-    }
+  const toggleSignUpMode = () => {
+    setIsSignUp(!isSignUp);
+    setPassword("");
   };
 
   return (
     <div className={cn("flex w-[100%] flex-col min-h-screen bg-black relative", className)}>
+      {/* Background with animated dots */}
       <div className="absolute inset-0 z-0">
-        {initialCanvasVisible && (
-          <div className="absolute inset-0">
-            <CanvasRevealEffect
-              animationSpeed={3}
-              containerClassName="bg-black"
-              colors={[
-                [255, 255, 255],
-                [255, 255, 255],
-              ]}
-              dotSize={6}
-              reverse={false}
-            />
-          </div>
-        )}
-        
-        {reverseCanvasVisible && (
-          <div className="absolute inset-0">
-            <CanvasRevealEffect
-              animationSpeed={4}
-              containerClassName="bg-black"
-              colors={[
-                [255, 255, 255],
-                [255, 255, 255],
-              ]}
-              dotSize={6}
-              reverse={true}
-            />
-          </div>
-        )}
-        
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,0,0,1)_0%,_transparent_100%)]" />
-        <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-black to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-black to-gray-900">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.1)_1px,_transparent_1px)] bg-[size:50px_50px] opacity-20" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(120,119,198,0.1)_0%,_transparent_50%)]" />
+        </div>
       </div>
       
       <div className="relative z-10 flex flex-col flex-1">
@@ -272,7 +95,7 @@ export const SignInPage = ({ className, onSignInSuccess }: SignInPageProps) => {
                         <div className="relative">
                           <input 
                             type="email" 
-                            placeholder="info@gmail.com"
+                            placeholder="Enter your email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full backdrop-blur-[1px] text-white border-1 border-white/10 rounded-full py-3 px-4 focus:outline-none focus:border focus:border-white/30 text-center bg-transparent"
@@ -299,9 +122,9 @@ export const SignInPage = ({ className, onSignInSuccess }: SignInPageProps) => {
                       By signing up, you agree to our Terms and Privacy Policy
                     </p>
                   </motion.div>
-                ) : step === "code" ? (
+                ) : step === "password" ? (
                   <motion.div 
-                    key="code-step"
+                    key="password-step"
                     initial={{ opacity: 0, x: 100 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 100 }}
@@ -309,73 +132,59 @@ export const SignInPage = ({ className, onSignInSuccess }: SignInPageProps) => {
                     className="space-y-6 text-center"
                   >
                     <div className="space-y-1">
-                      <h1 className="text-[2.5rem] font-bold leading-[1.1] tracking-tight text-white">We sent you a code</h1>
-                      <p className="text-[1.25rem] text-white/50 font-light">Please enter it</p>
+                      <h1 className="text-[2.5rem] font-bold leading-[1.1] tracking-tight text-white">
+                        {isSignUp ? "Create Account" : "Welcome back"}
+                      </h1>
+                      <p className="text-[1.25rem] text-white/50 font-light">
+                        {isSignUp ? "Enter a password for your new account" : "Enter your password to continue"}
+                      </p>
                     </div>
                     
-                    <div className="w-full">
-                      <div className="relative rounded-full py-4 px-5 border border-white/10 bg-transparent">
-                        <div className="flex items-center justify-center">
-                          {code.map((digit, i) => (
-                            <div key={i} className="flex items-center">
-                              <div className="relative">
-                                <input
-                                  ref={(el) => {
-                                    codeInputRefs.current[i] = el;
-                                  }}
-                                  type="text"
-                                  inputMode="numeric"
-                                  pattern="[0-9]*"
-                                  maxLength={1}
-                                  value={digit}
-                                  onChange={e => handleCodeChange(i, e.target.value)}
-                                  onKeyDown={e => handleKeyDown(i, e)}
-                                  className="w-8 text-center text-xl bg-transparent text-white border-none focus:outline-none focus:ring-0 appearance-none"
-                                  style={{ caretColor: 'transparent' }}
-                                />
-                                {!digit && (
-                                  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center pointer-events-none">
-                                    <span className="text-xl text-white">0</span>
-                                  </div>
-                                )}
-                              </div>
-                              {i < 5 && <span className="text-white/20 text-xl">|</span>}
-                            </div>
-                          ))}
-                        </div>
+                    <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                      <div className="relative">
+                        <input
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder={isSignUp ? "Create a password" : "Enter your password"}
+                          className="w-full backdrop-blur-[1px] text-white border-1 border-white/10 rounded-full py-3 px-4 focus:outline-none focus:border focus:border-white/30 text-center bg-transparent"
+                          required
+                        />
                       </div>
-                    </div>
+                      
+                      <div className="flex w-full gap-3">
+                        <motion.button 
+                          type="button"
+                          onClick={handleBackClick}
+                          className="rounded-full bg-white text-black font-medium px-8 py-3 hover:bg-white/90 transition-colors w-[30%]"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          Back
+                        </motion.button>
+                        <motion.button 
+                          type="submit"
+                          className={cn(
+                            "flex-1 rounded-full font-medium py-3 border transition-all duration-300",
+                            password 
+                            ? "bg-white text-black border-transparent hover:bg-white/90 cursor-pointer" 
+                            : "bg-[#111] text-white/50 border-white/10 cursor-not-allowed"
+                          )}
+                          disabled={!password}
+                        >
+                          {isSignUp ? "Create Account" : "Continue"}
+                        </motion.button>
+                      </div>
+                    </form>
                     
-                    <div>
-                      <motion.p 
-                        className="text-white/50 hover:text-white/70 transition-colors cursor-pointer text-sm"
-                        whileHover={{ scale: 1.02 }}
-                        transition={{ duration: 0.2 }}
+                    <div className="text-center">
+                      <button 
+                        onClick={toggleSignUpMode}
+                        className="text-white/50 hover:text-white/70 transition-colors text-sm"
                       >
-                        Resend code
-                      </motion.p>
-                    </div>
-                    
-                    <div className="flex w-full gap-3">
-                      <motion.button 
-                        onClick={handleBackClick}
-                        className="rounded-full bg-white text-black font-medium px-8 py-3 hover:bg-white/90 transition-colors w-[30%]"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        Back
-                      </motion.button>
-                      <motion.button 
-                        className={`flex-1 rounded-full font-medium py-3 border transition-all duration-300 ${
-                          code.every(d => d !== "") 
-                          ? "bg-white text-black border-transparent hover:bg-white/90 cursor-pointer" 
-                          : "bg-[#111] text-white/50 border-white/10 cursor-not-allowed"
-                        }`}
-                        disabled={!code.every(d => d !== "")}
-                      >
-                        Continue
-                      </motion.button>
+                        {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
+                      </button>
                     </div>
                   </motion.div>
                 ) : (
@@ -403,16 +212,6 @@ export const SignInPage = ({ className, onSignInSuccess }: SignInPageProps) => {
                         </svg>
                       </div>
                     </motion.div>
-                    
-                    <motion.button 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 1 }}
-                      onClick={handleContinueToDashboard}
-                      className="w-full rounded-full bg-white text-black font-medium py-3 hover:bg-white/90 transition-colors"
-                    >
-                      Continue to Dashboard
-                    </motion.button>
                   </motion.div>
                 )}
               </AnimatePresence>
