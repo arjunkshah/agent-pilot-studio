@@ -1,13 +1,15 @@
-
 import React, { useState, useEffect } from 'react'
 import { HeroSection } from '@/components/ui/hero-section-dark'
 import { AnimatedAIChat } from '@/components/ui/animated-ai-chat'
 import { SignInPage } from '@/components/ui/sign-in-flow-1'
+import ChatInterface from '@/components/ChatInterface'
 import { motion } from 'framer-motion'
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [showSignIn, setShowSignIn] = useState(false)
+  const [showChat, setShowChat] = useState(false)
+  const [initialTask, setInitialTask] = useState<string>('')
 
   // Check if user is logged in on component mount
   useEffect(() => {
@@ -30,15 +32,32 @@ const Index = () => {
     }
   }
 
+  const handleTaskSubmit = (task: string) => {
+    setInitialTask(task)
+    setShowChat(true)
+  }
+
+  const handleBackToHome = () => {
+    setShowChat(false)
+    setInitialTask('')
+  }
+
   const handleLogout = () => {
     localStorage.removeItem('pilot_logged_in')
     localStorage.removeItem('pilot_user_email')
     setIsLoggedIn(false)
+    setShowChat(false)
+    setInitialTask('')
   }
 
   // If showing sign-in, render only the sign-in component
   if (showSignIn) {
     return <SignInPage onSignInSuccess={handleSignInSuccess} />
+  }
+
+  // If showing chat interface, render the fullscreen chat
+  if (showChat) {
+    return <ChatInterface initialTask={initialTask} onBack={handleBackToHome} />
   }
 
   return (
@@ -77,7 +96,7 @@ const Index = () => {
 
       {isLoggedIn ? (
         <div className="pt-24 pb-20">
-          <AnimatedAIChat />
+          <AnimatedAIChat onTaskSubmit={handleTaskSubmit} />
         </div>
       ) : (
         <>
