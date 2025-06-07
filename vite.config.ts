@@ -22,8 +22,20 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
   esbuild: {
-    target: 'es2020'
-  }
+    target: 'es2020',
+    jsx: 'automatic',
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+  },
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(mode),
+  },
 }));
