@@ -11,9 +11,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react({
-      jsxImportSource: 'react',
-    }),
+    react(),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
@@ -22,4 +20,10 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    sourcemap: true,
+  },
+  esbuild: {
+    target: 'es2020'
+  }
 }));
