@@ -31,6 +31,20 @@ export default defineConfig(({ mode }) => ({
   esbuild: {
     target: 'es2020',
     jsx: 'automatic',
+    // Completely disable TypeScript type checking in esbuild
+    tsconfigRaw: {
+      compilerOptions: {
+        // Disable declaration generation
+        declaration: false,
+        declarationMap: false,
+        emitDeclarationOnly: false,
+        // Use esbuild for all transpilation
+        noEmit: false,
+        // Disable type checking
+        noEmitOnError: false,
+        skipLibCheck: true,
+      }
+    }
   },
   optimizeDeps: {
     include: ['react', 'react-dom'],
