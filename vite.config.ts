@@ -38,11 +38,4 @@ export default defineConfig(({ mode }) => ({
   define: {
     'process.env.NODE_ENV': JSON.stringify(mode),
   },
-  // Explicitly disable TypeScript declaration checking in Vite
-  typescript: {
-    check: false,
-    build: {
-      generateDts: false,
-    },
-  },
 }));
