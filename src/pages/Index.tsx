@@ -1,3 +1,4 @@
+
 /** @jsxImportSource react */
 import React, { useState, useEffect, useRef } from 'react'
 import { HeroSection } from '@/components/ui/hero-section-dark'
@@ -9,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card } from '@/components/ui/card'
 import { MessageSquare, PlusIcon, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 
 export interface Message {
   id: string
@@ -32,6 +34,7 @@ const Index = () => {
   const [chats, setChats] = useState<Chat[]>([])
   const [activeChat, setActiveChat] = useState<string | null>(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [authError, setAuthError] = useState<string>('')
 
   // Check if user is logged in on component mount
   useEffect(() => {
@@ -45,7 +48,11 @@ const Index = () => {
         const parsedChats = JSON.parse(savedChats)
         setChats(parsedChats.map((chat: any) => ({
           ...chat,
-          createdAt: new Date(chat.createdAt)
+          createdAt: new Date(chat.createdAt),
+          messages: chat.messages.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp)
+          }))
         })))
       } catch (e) {
         console.error('Failed to parse saved chats', e)
@@ -63,14 +70,19 @@ const Index = () => {
   const handleSignInSuccess = () => {
     setIsLoggedIn(true)
     setShowSignIn(false)
+    setAuthError('')
+    toast.success('Successfully signed in!')
+  }
+
+  const handleSignInError = (error: string) => {
+    setAuthError(error)
+    toast.error(error)
   }
 
   const handleGetStartedClick = () => {
     if (isLoggedIn) {
-      // Already logged in, do nothing or scroll to task input
       return
     } else {
-      // Show sign-in modal
       setShowSignIn(true)
     }
   }
@@ -118,11 +130,18 @@ const Index = () => {
     setShowChat(false)
     setInitialTask('')
     setActiveChat(null)
+    toast.success('Successfully logged out')
   }
 
   // If showing sign-in, render only the sign-in component
   if (showSignIn) {
-    return <SignInPage onSignInSuccess={handleSignInSuccess} />
+    return (
+      <SignInPage 
+        onSignInSuccess={handleSignInSuccess} 
+        onSignInError={handleSignInError}
+        authError={authError}
+      />
+    )
   }
 
   return (
@@ -167,20 +186,20 @@ const Index = () => {
         {showChat ? (
           <motion.div 
             className="h-screen pt-16 flex bg-background"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
           >
             {/* Sidebar */}
             <AnimatePresence initial={false}>
               {isSidebarOpen && (
                 <motion.div 
                   className="w-80 border-r border-border bg-card flex flex-col"
-                  initial={{ width: 0, opacity: 0 }}
-                  animate={{ width: 320, opacity: 1 }}
-                  exit={{ width: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{ x: -320, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -320, opacity: 0 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
                 >
                   {/* Header */}
                   <div className="p-4 border-b border-border">
@@ -268,10 +287,10 @@ const Index = () => {
         ) : (
           <motion.div
             className="pt-24 pb-20"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
           >
             {isLoggedIn ? (
               <div className="relative">
@@ -284,8 +303,8 @@ const Index = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <h3 className="text-lg font-medium text-foreground mb-4">Recent Chats</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <h3 className="text-lg font-medium text-foreground mb-4 px-4">Recent Chats</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 px-4">
                       {chats.slice(0, 4).map(chat => (
                         <Card
                           key={chat.id}
@@ -311,7 +330,6 @@ const Index = () => {
               </div>
             ) : (
               <>
-                {/* Hero Section */}
                 <HeroSection
                   title="AI Agents for Any Task"
                   subtitle={{
