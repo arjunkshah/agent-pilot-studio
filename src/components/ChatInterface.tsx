@@ -1,11 +1,10 @@
+
 /** @jsxImportSource react */
 import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { PlusIcon, MessageSquare, Send, User, Bot } from 'lucide-react'
+import { PlusIcon, MessageSquare, Send, User, Bot, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Message, Chat } from '@/pages/Index'
 
@@ -114,58 +113,92 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const currentChat = chats.find(chat => chat.id === activeChat)
 
   return (
-    <div className="h-full flex flex-col bg-background">
+    <div className="h-full flex flex-col bg-background relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-background/50">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-500/5 rounded-full mix-blend-normal filter blur-[128px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/5 rounded-full mix-blend-normal filter blur-[128px] animate-pulse delay-700" />
+        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-fuchsia-500/5 rounded-full mix-blend-normal filter blur-[96px] animate-pulse delay-1000" />
+      </div>
+
       {currentChat ? (
         <>
           {/* Chat Header */}
-          <div className="p-4 border-b border-border bg-card">
-            <h3 className="text-lg font-semibold text-foreground truncate">
-              {currentChat.title}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              AI agents working on your task
-            </p>
-          </div>
+          <motion.div 
+            className="relative z-10 p-6 border-b border-border/50 bg-card/50 backdrop-blur-xl"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-foreground truncate">
+                  {currentChat.title}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  AI agents working on your task
+                </p>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Messages */}
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4 max-w-4xl mx-auto">
-              {currentChat.messages.map((msg) => (
-                <motion.div
-                  key={msg.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div className={`flex items-start space-x-3 max-w-[80%] ${
-                    msg.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
-                  }`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      msg.sender === 'user' 
-                        ? 'bg-gradient-to-r from-purple-600 to-blue-600' 
-                        : 'bg-muted'
+          <ScrollArea className="flex-1 relative z-10">
+            <div className="p-6 space-y-6 max-w-4xl mx-auto">
+              <AnimatePresence>
+                {currentChat.messages.map((msg, index) => (
+                  <motion.div
+                    key={msg.id}
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ 
+                      duration: 0.4, 
+                      delay: index * 0.1,
+                      ease: "easeOut"
+                    }}
+                    className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`flex items-start space-x-4 max-w-[80%] ${
+                      msg.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
                     }`}>
-                      {msg.sender === 'user' ? (
-                        <User className="w-4 h-4 text-white" />
-                      ) : (
-                        <Bot className="w-4 h-4 text-foreground" />
-                      )}
+                      <motion.div 
+                        className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          msg.sender === 'user' 
+                            ? 'bg-gradient-to-r from-purple-600 to-blue-600' 
+                            : 'bg-gradient-to-r from-muted to-muted/50 border border-border/50'
+                        }`}
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {msg.sender === 'user' ? (
+                          <User className="w-5 h-5 text-white" />
+                        ) : (
+                          <Bot className="w-5 h-5 text-foreground" />
+                        )}
+                      </motion.div>
+                      <motion.div 
+                        className={`p-4 rounded-2xl backdrop-blur-sm border ${
+                          msg.sender === 'user' 
+                            ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white border-purple-500/20' 
+                            : 'bg-card/50 border-border/50'
+                        }`}
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                        <p className={`text-xs mt-3 ${
+                          msg.sender === 'user' ? 'text-white/60' : 'text-muted-foreground'
+                        }`}>
+                          {new Date(msg.timestamp).toLocaleTimeString()}
+                        </p>
+                      </motion.div>
                     </div>
-                    <Card className={`p-3 ${
-                      msg.sender === 'user' 
-                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white' 
-                        : 'bg-muted'
-                    }`}>
-                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                      <p className={`text-xs mt-2 ${
-                        msg.sender === 'user' ? 'text-white/70' : 'text-muted-foreground'
-                      }`}>
-                        {new Date(msg.timestamp).toLocaleTimeString()}
-                      </p>
-                    </Card>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
 
               {isTyping && (
                 <motion.div
@@ -173,17 +206,29 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   className="flex justify-start"
                 >
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                      <Bot className="w-4 h-4 text-foreground" />
+                  <div className="flex items-start space-x-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-muted to-muted/50 border border-border/50 flex items-center justify-center">
+                      <Bot className="w-5 h-5 text-foreground" />
                     </div>
-                    <Card className="p-3 bg-muted">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" />
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    <div className="p-4 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm">
+                      <div className="flex space-x-2">
+                        <motion.div 
+                          className="w-2 h-2 bg-muted-foreground rounded-full"
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 1, repeat: Infinity, delay: 0 }}
+                        />
+                        <motion.div 
+                          className="w-2 h-2 bg-muted-foreground rounded-full"
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
+                        />
+                        <motion.div 
+                          className="w-2 h-2 bg-muted-foreground rounded-full"
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
+                        />
                       </div>
-                    </Card>
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -192,43 +237,68 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </ScrollArea>
 
           {/* Message Input */}
-          <div className="p-4 border-t border-border bg-card">
+          <motion.div 
+            className="relative z-10 p-6 border-t border-border/50 bg-card/50 backdrop-blur-xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
-              <div className="flex space-x-3">
-                <div className="flex-1 relative">
-                  <Textarea
-                    ref={textareaRef}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Type your message..."
-                    className="min-h-[60px] max-h-[200px] resize-none pr-12"
-                  />
-                  <Button
-                    type="submit"
-                    size="sm"
-                    disabled={!message.trim() || isTyping}
-                    className="absolute right-2 bottom-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </div>
+              <div className="relative">
+                <Textarea
+                  ref={textareaRef}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Type your message..."
+                  className="min-h-[60px] max-h-[200px] resize-none pr-16 bg-background/50 border-border/50 focus:border-primary/50 rounded-xl backdrop-blur-sm"
+                />
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={!message.trim() || isTyping}
+                  className="absolute right-3 bottom-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg shadow-lg"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
               </div>
             </form>
-          </div>
+          </motion.div>
         </>
       ) : (
-        <div className="flex-1 flex items-center justify-center">
+        <motion.div 
+          className="flex-1 flex items-center justify-center relative z-10"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="text-center">
-            <MessageSquare className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="w-20 h-20 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6"
+            >
+              <MessageSquare className="w-10 h-10 text-white" />
+            </motion.div>
+            <motion.h3 
+              className="text-2xl font-semibold text-foreground mb-3"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
               No chat selected
-            </h3>
-            <p className="text-muted-foreground mb-4">
-              Select a chat from the sidebar or create a new one
-            </p>
+            </motion.h3>
+            <motion.p 
+              className="text-muted-foreground mb-6"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              Select a chat from the sidebar or create a new one to get started
+            </motion.p>
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   )
