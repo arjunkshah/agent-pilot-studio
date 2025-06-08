@@ -184,7 +184,7 @@ export function AnimatedAIChat({ onTaskSubmit, onTaskChange }: AnimatedAIChatPro
     } else {
       setShowCommandPalette(false);
     }
-  }, [value]);
+  }, [value, commandSuggestions]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
