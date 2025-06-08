@@ -1,6 +1,13 @@
-import { GradientCard } from "@/components/ui/gradient-card"
 
-export const Demo = () => {
-  return <GradientCard />
-}
-export default Demo
+import { SignInPage } from "@/components/ui/sign-in-flow-new";
+
+const DemoOne = () => {
+  return (
+    <div className="flex w-full h-screen justify-center items-center">
+      <SignInPage />
+    </div>
+  );
+};
+
+export { DemoOne };
+export default DemoOne;

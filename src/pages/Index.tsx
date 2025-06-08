@@ -1,9 +1,10 @@
+
 /** @jsxImportSource react */
 import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { HeroSection } from '@/components/ui/hero-section-dark'
 import { AnimatedAIChat } from '@/components/ui/animated-ai-chat'
-import { SignInModal } from '@/components/ui/sign-in-flow-adapted'
+import { SignInPage } from '@/components/ui/sign-in-flow-new'
 import ChatInterface from '@/components/ChatInterface'
 import AgentCards from '@/components/AgentCards'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -138,14 +139,13 @@ const Index = () => {
   if (showSignIn) {
     return (
       <div className="fixed inset-0 z-50 bg-background">
-        <SignInModal 
+        <SignInPage 
           onSignInSuccess={handleSignInSuccess} 
           onSignInError={handleSignInError}
-          authError={authError}
         />
         <button
           onClick={() => setShowSignIn(false)}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors z-30"
         >
           <ArrowLeft className="w-6 h-6" />
         </button>
