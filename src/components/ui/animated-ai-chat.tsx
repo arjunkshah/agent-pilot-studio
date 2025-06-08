@@ -311,7 +311,7 @@ export function AnimatedAIChat({ onTaskSubmit }: AnimatedAIChatProps) {
                             transition={{ delay: 0.2, duration: 0.5 }}
                             className="inline-block"
                         >
-                            <h1 className="text-3xl font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/40 pb-1">
+                            <h1 className="text-3xl font-medium tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-white/90 to-white/40 pb-1">
                                 What do you need done?
                             </h1>
                             <motion.div 
