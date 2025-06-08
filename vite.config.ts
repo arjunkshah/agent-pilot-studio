@@ -50,6 +50,9 @@ export default defineConfig(({ mode }) => ({
         noUnusedLocals: false,
         noUnusedParameters: false,
         noFallthroughCasesInSwitch: true,
+        declaration: false,
+        declarationMap: false,
+        emitDeclarationOnly: false,
       }
     }
   },
