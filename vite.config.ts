@@ -22,29 +22,8 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks: undefined,
-      },
-    },
   },
   esbuild: {
-    target: 'es2020',
-    jsx: 'automatic',
-    loader: 'tsx',
-    logOverride: { 'this-is-undefined-in-esm': 'silent' }
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom'],
-    esbuildOptions: {
-      loader: {
-        '.ts': 'tsx',
-        '.tsx': 'tsx'
-      }
-    }
-  },
-  define: {
-    'process.env.NODE_ENV': JSON.stringify(mode),
-  },
-  clearScreen: false,
+    target: 'es2020'
+  }
 }));
