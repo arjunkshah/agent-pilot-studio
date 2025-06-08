@@ -31,6 +31,7 @@ const Index = () => {
   const [showSignIn, setShowSignIn] = useState(false)
   const [showChat, setShowChat] = useState(false)
   const [initialTask, setInitialTask] = useState<string>('')
+  const [draftTask, setDraftTask] = useState('')
   const [chats, setChats] = useState<Chat[]>([])
   const [activeChat, setActiveChat] = useState<string | null>(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
@@ -102,10 +103,30 @@ const Index = () => {
   }
 
   const handleTaskSubmit = (task: string) => {
-    const chatId = createNewChat(task)
+    let chatId = activeChat
+    if (!chatId) {
+      chatId = createNewChat(task)
+      setActiveChat(chatId)
+    } else {
+      // update title if still default
+      setChats(prev => prev.map(c =>
+        c.id === chatId && c.title === 'New Chat'
+          ? { ...c, title: task.slice(0,50) + (task.length>50? '...' : '') }
+          : c
+      ))
+    }
+    setDraftTask('')
     setInitialTask(task)
     setShowChat(true)
-    setActiveChat(chatId)
+  }
+
+  const handleTaskChange = (text: string) => {
+    setDraftTask(text)
+    if (!showChat && text.trim().length > 0) {
+      const id = createNewChat()
+      setActiveChat(id)
+      setShowChat(true)
+    }
   }
 
   const handleSelectChat = (chatId: string) => {
@@ -283,8 +304,9 @@ const Index = () => {
 
             {/* Chat interface */}
             <div className="flex-1">
-              <ChatInterface 
-                initialTask={initialTask} 
+              <ChatInterface
+                initialTask={initialTask}
+                draftMessage={draftTask}
                 onBack={handleBackToHome}
                 activeChat={activeChat}
                 chats={chats}
@@ -302,7 +324,7 @@ const Index = () => {
           >
             {isLoggedIn ? (
               <div className="relative">
-                <AnimatedAIChat onTaskSubmit={handleTaskSubmit} />
+                <AnimatedAIChat onTaskSubmit={handleTaskSubmit} onTaskChange={handleTaskChange} />
                 
                 {/* Agent Cards Section */}
                 <motion.div 

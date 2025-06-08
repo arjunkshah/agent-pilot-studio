@@ -10,23 +10,31 @@ import { Message, Chat } from '@/pages/Index'
 
 interface ChatInterfaceProps {
   initialTask?: string
+  draftMessage?: string
   onBack?: () => void
   activeChat: string | null
   chats: Chat[]
   setChats: React.Dispatch<React.SetStateAction<Chat[]>>
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
-  initialTask, 
-  onBack, 
-  activeChat, 
-  chats, 
-  setChats 
+const ChatInterface: React.FC<ChatInterfaceProps> = ({
+  initialTask,
+  draftMessage,
+  onBack,
+  activeChat,
+  chats,
+  setChats
 }) => {
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState(draftMessage || '')
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (draftMessage !== undefined) {
+      setMessage(draftMessage)
+    }
+  }, [draftMessage])
 
   // Initialize with the initial task if provided
   useEffect(() => {
@@ -58,10 +66,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       timestamp: new Date()
     }
 
-    // Add user message
-    setChats(prev => prev.map(chat => 
-      chat.id === targetChatId 
-        ? { ...chat, messages: [...chat.messages, userMessage] }
+    // Add user message and set title if not set
+    setChats(prev => prev.map(chat =>
+      chat.id === targetChatId
+        ? {
+            ...chat,
+            title: chat.title === 'New Chat'
+              ? content.trim().slice(0, 50) + (content.trim().length > 50 ? '...' : '')
+              : chat.title,
+            messages: [...chat.messages, userMessage]
+          }
         : chat
     ))
 
