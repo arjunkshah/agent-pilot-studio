@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { PlusIcon, MessageSquare, Send, User, Bot, Sparkles } from 'lucide-react'
+import { MessageSquare, Send, User, Bot, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Message, Chat } from '@/pages/Index'
 
