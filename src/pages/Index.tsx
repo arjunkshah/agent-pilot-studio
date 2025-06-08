@@ -1,10 +1,10 @@
-
 /** @jsxImportSource react */
 import React, { useState, useEffect, useRef } from 'react'
 import { HeroSection } from '@/components/ui/hero-section-dark'
 import { AnimatedAIChat } from '@/components/ui/animated-ai-chat'
 import { SignInModal } from '@/components/ui/sign-in-flow-adapted'
 import ChatInterface from '@/components/ChatInterface'
+import AgentCards from '@/components/AgentCards'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card } from '@/components/ui/card'
@@ -136,11 +136,19 @@ const Index = () => {
   // If showing sign-in, render only the sign-in component
   if (showSignIn) {
     return (
-      <SignInModal 
-        onSignInSuccess={handleSignInSuccess} 
-        onSignInError={handleSignInError}
-        authError={authError}
-      />
+      <div className="fixed inset-0 z-50 bg-background">
+        <SignInModal 
+          onSignInSuccess={handleSignInSuccess} 
+          onSignInError={handleSignInError}
+          authError={authError}
+        />
+        <button
+          onClick={() => setShowSignIn(false)}
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+      </div>
     )
   }
 
@@ -296,12 +304,22 @@ const Index = () => {
               <div className="relative">
                 <AnimatedAIChat onTaskSubmit={handleTaskSubmit} />
                 
+                {/* Agent Cards Section */}
+                <motion.div 
+                  className="mt-12 max-w-4xl mx-auto px-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <AgentCards />
+                </motion.div>
+                
                 {chats.length > 0 && (
                   <motion.div 
                     className="mt-8 max-w-2xl mx-auto"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
+                    transition={{ delay: 0.4 }}
                   >
                     <h3 className="text-lg font-medium text-foreground mb-4 px-4">Recent Chats</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 px-4">
