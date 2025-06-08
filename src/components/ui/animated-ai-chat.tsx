@@ -1,17 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useTransition } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   ImageIcon,
-  FileUp,
   Figma,
   MonitorIcon,
-  CircleUserRound,
-  ArrowUpIcon,
   Paperclip,
-  PlusIcon,
   SendIcon,
   XIcon,
   LoaderIcon,
@@ -134,10 +130,8 @@ export function AnimatedAIChat({ onTaskSubmit, onTaskChange }: AnimatedAIChatPro
   const [value, setValue] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const [activeSuggestion, setActiveSuggestion] = useState<number>(-1);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
-  const [recentCommand, setRecentCommand] = useState<string | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 60,
@@ -237,9 +231,6 @@ export function AnimatedAIChat({ onTaskSubmit, onTaskChange }: AnimatedAIChatPro
           const selectedCommand = commandSuggestions[activeSuggestion];
           setValue(selectedCommand.prefix + ' ');
           setShowCommandPalette(false);
-
-          setRecentCommand(selectedCommand.label);
-          setTimeout(() => setRecentCommand(null), 3500);
         }
       } else if (e.key === 'Escape') {
         e.preventDefault();
@@ -282,9 +273,6 @@ export function AnimatedAIChat({ onTaskSubmit, onTaskChange }: AnimatedAIChatPro
     const selectedCommand = commandSuggestions[index];
     setValue(selectedCommand.prefix + ' ');
     setShowCommandPalette(false);
-
-    setRecentCommand(selectedCommand.label);
-    setTimeout(() => setRecentCommand(null), 2000);
   };
 
   return (
