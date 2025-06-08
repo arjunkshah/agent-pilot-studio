@@ -11,10 +11,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react({
-      jsxImportSource: 'react',
-      plugins: [['@swc/plugin-styled-components', {}]],
-    }),
+    react(),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
@@ -23,17 +20,4 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  build: {
-    lib: false,
-    emptyOutDir: true,
-  },
-  esbuild: {
-    tsconfigRaw: {
-      compilerOptions: {
-        declaration: false,
-        declarationMap: false,
-        emitDeclarationOnly: false,
-      }
-    }
-  }
 }));
