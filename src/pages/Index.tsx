@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { HeroSection } from '@/components/ui/hero-section-dark'
 import { AnimatedAIChat } from '@/components/ui/animated-ai-chat'
-import { SignInPage } from '@/components/ui/sign-in-flow-1'
+import { SignInModal } from '@/components/ui/sign-in-flow-adapted'
 import ChatInterface from '@/components/ChatInterface'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -136,7 +136,7 @@ const Index = () => {
   // If showing sign-in, render only the sign-in component
   if (showSignIn) {
     return (
-      <SignInPage 
+      <SignInModal 
         onSignInSuccess={handleSignInSuccess} 
         onSignInError={handleSignInError}
         authError={authError}
