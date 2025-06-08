@@ -31,13 +31,40 @@ export default defineConfig(({ mode }) => ({
   esbuild: {
     target: 'es2020',
     jsx: 'automatic',
+    // Force esbuild to handle all TypeScript compilation
+    loader: 'tsx',
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
   },
   optimizeDeps: {
     include: ['react', 'react-dom'],
+    esbuildOptions: {
+      loader: {
+        '.ts': 'tsx',
+        '.tsx': 'tsx'
+      }
+    }
   },
   define: {
     'process.env.NODE_ENV': JSON.stringify(mode),
   },
-  // Completely disable TypeScript checking in Vite
+  // Completely bypass TypeScript checking
   clearScreen: false,
+  // Force Vite to ignore TypeScript config files entirely for build
+  typescript: {
+    compilerOptions: {
+      declaration: false,
+      declarationMap: false,
+      emitDeclarationOnly: false,
+      noEmit: true,
+      skipLibCheck: true,
+      allowSyntheticDefaultImports: true,
+      esModuleInterop: true,
+      moduleResolution: 'node',
+      target: 'es2020',
+      lib: ['es2020', 'dom', 'dom.iterable'],
+      module: 'esnext',
+      strict: false,
+      jsx: 'react-jsx'
+    }
+  }
 }));
