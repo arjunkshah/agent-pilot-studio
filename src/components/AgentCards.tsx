@@ -14,9 +14,11 @@ interface Agent {
   status: string;
 }
 
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || '';
+
 const fetchAgents = async (): Promise<Agent[]> => {
-  // Replace with your actual backend URL
-  const response = await fetch('/api/agents');
+  const url = `${API_BASE_URL}/api/agents`;
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error('Failed to fetch agents');
   }
