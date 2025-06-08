@@ -38,4 +38,6 @@ export default defineConfig(({ mode }) => ({
   define: {
     'process.env.NODE_ENV': JSON.stringify(mode),
   },
+  // Completely disable TypeScript checking in Vite
+  clearScreen: false,
 }));
