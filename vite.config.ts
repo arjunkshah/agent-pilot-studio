@@ -49,7 +49,12 @@ export default defineConfig(({ mode }) => ({
         declaration: false,
         declarationMap: false,
         emitDeclarationOnly: false,
+        composite: false,
+        incremental: false,
       }
     }
+  },
+  define: {
+    'process.env': {}
   }
 }));
