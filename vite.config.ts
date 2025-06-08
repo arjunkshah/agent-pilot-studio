@@ -31,30 +31,6 @@ export default defineConfig(({ mode }) => ({
   esbuild: {
     target: "es2020",
     format: "esm",
-    tsconfigRaw: {
-      compilerOptions: {
-        target: "ES2020",
-        lib: ["ES2020", "DOM", "DOM.Iterable"],
-        allowJs: true,
-        skipLibCheck: true,
-        esModuleInterop: false,
-        allowSyntheticDefaultImports: true,
-        strict: false,
-        forceConsistentCasingInFileNames: true,
-        module: "ESNext",
-        moduleResolution: "node",
-        resolveJsonModule: true,
-        isolatedModules: true,
-        noEmit: true,
-        jsx: "react-jsx",
-        noUnusedLocals: false,
-        noUnusedParameters: false,
-        noFallthroughCasesInSwitch: true,
-        declaration: false,
-        declarationMap: false,
-        emitDeclarationOnly: false,
-      }
-    }
   },
   define: {
     'process.env': {}
