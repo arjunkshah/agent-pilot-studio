@@ -1,5 +1,6 @@
 /** @jsxImportSource react */
 import React, { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { HeroSection } from '@/components/ui/hero-section-dark'
 import { AnimatedAIChat } from '@/components/ui/animated-ai-chat'
 import { SignInModal } from '@/components/ui/sign-in-flow-adapted'
@@ -169,6 +170,7 @@ const Index = () => {
                 <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">How it works</a>
                 <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Examples</a>
                 <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
+                <Link to="/agents" className="text-muted-foreground hover:text-foreground transition-colors">Agent Gallery</Link>
               </>
             )}
             {isLoggedIn ? (
